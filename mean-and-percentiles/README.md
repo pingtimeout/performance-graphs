@@ -29,6 +29,8 @@ The script procudes two graphs :
 * One graph "mean.png" contains the evolution of the mean over the given period
 * One graph "percentiles.png" contains the evolution of the 90th, 99th, 99.9th and maximum over the given period
 
+The metrics are consolidated on a per-minute basis.
+
 # Licence
 
 Copyright (c) 2014, Pierre Laporte
