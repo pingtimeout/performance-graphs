@@ -1,0 +1,29 @@
+#!/bin/sh
+
+#
+# Copyright (c) 2015, Pierre Laporte
+#
+# This code is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License version 3 only, as
+# published by the Free Software Foundation.
+#
+# This code is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this work; if not, see <http://www.gnu.org/licenses/>.
+#
+
+#
+# This scripts generates graphs from a ping output.
+#
+# Usage : ./ping-to-gnuplot.sh ping-example
+#
+# The ping file MUST have the following columns :
+# 64 bytes from i-9g07bbef8.c.eng-gce-test.internal (10.261.154.149): icmp_req=2 ttl=64 time=0.502 ms
+#
+
+perl -pe 's/.*time=([0-9\.]+) ms$/$1/' $1 | gnuplot ping.gnuplot > $1.png
+
