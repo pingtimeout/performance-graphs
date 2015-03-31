@@ -38,76 +38,73 @@ GREY="7F7F7F"
 # dstat outputs
 cat << EOF | gnuplot > $2dstat-procs.png
 set datafile separator ","
-set xtics rotate
+set xtics rotate by -45
 set xdata time
 set timefmt "%d-%m %H:%M:%S"
 set format x "%m-%d %H:%M"
 set term png size $SIZE
 set grid layerdefault
 plot \
- '$1' using 24:1 title 'Runnable queue' with lines lt rgb "#$GREEN", \
- '$1' using 24:2 title 'Blocked queue' with lines lt rgb "#$RED"
+ '$1' using 24:1 every ::7 title 'Runnable queue' with lines lt rgb "#$GREEN", \
+ '$1' using 24:2 every ::7 title 'Blocked queue' with lines lt rgb "#$RED"
 EOF
 
 cat << EOF | gnuplot > $2dstat-memory.png
 set datafile separator ","
-set xtics rotate
+set xtics rotate by -45
 set xdata time
 set timefmt "%d-%m %H:%M:%S"
 set format x "%m-%d %H:%M"
 set term png size $SIZE
 set grid layerdefault
 set format y "%.0s %cB"
-set yrange [0:]
 plot \
- '$1' using 24:7 title 'Free memory' with lines lt rgb "#$GREEN", \
- '$1' using 24:8 title 'Swapped memory' with lines lt rgb "#$RED"
+ '$1' using 24:7 every ::7 title 'Free memory' with lines lt rgb "#$GREEN", \
+ '$1' using 24:8 every ::7 title 'Swapped memory' with lines lt rgb "#$RED"
 EOF
 
 cat << EOF | gnuplot > $2dstat-swap-usage.png
 set datafile separator ","
-set xtics rotate
+set xtics rotate by -45
 set xdata time
 set timefmt "%d-%m %H:%M:%S"
 set format x "%m-%d %H:%M"
 set term png size $SIZE
 set grid layerdefault
 set format y "%.0s %cB"
-set yrange [0:]
 plot \
- '$1' using 24:10 title 'Swap in' with lines lt rgb "#$YELLOW", \
- '$1' using 24:11 title 'Swap out' with lines lt rgb "#$RED"
+ '$1' using 24:10 every ::7 title 'Swap in' with lines lt rgb "#$YELLOW", \
+ '$1' using 24:11 every ::7 title 'Swap out' with lines lt rgb "#$RED"
 EOF
 
 cat << EOF | gnuplot > $2dstat-disk-usage.png
 set datafile separator ","
-set xtics rotate
+set xtics rotate by -45
 set xdata time
 set timefmt "%d-%m %H:%M:%S"
 set format x "%m-%d %H:%M"
 set term png size $SIZE
 set grid layerdefault
-set yrange [0:]
 plot \
- '$1' using 24:12 title 'Blocks in' with lines lt rgb "#$YELLOW", \
- '$1' using 24:13 title 'Blocks out' with lines lt rgb "#$RED"
+ '$1' using 24:12 every ::7 title 'Blocks in' with lines lt rgb "#$YELLOW", \
+ '$1' using 24:13 every ::7 title 'Blocks out' with lines lt rgb "#$RED"
 EOF
 
 cat << EOF | gnuplot > $2dstat-context-switches.png
 set datafile separator ","
-set xtics rotate
+set xtics rotate by -45
 set xdata time
 set timefmt "%d-%m %H:%M:%S"
 set format x "%m-%d %H:%M"
 set term png size $SIZE
 set grid layerdefault
 plot \
- '$1' using 24:17 title 'Context switches' with lines lt rgb "#$GREY"
+ '$1' using 24:17 every ::7 title 'Context switches' with lines lt rgb "#$GREY"
 EOF
 
 cat << EOF | gnuplot > $2dstat-cpu-usage.png
 set datafile separator ","
-set xtics rotate
+set xtics rotate by -45
 set xdata time
 set timefmt "%d-%m %H:%M:%S"
 set format x "%m-%d %H:%M"
@@ -115,14 +112,14 @@ set term png size $SIZE
 set grid layerdefault
 set yrange [0:100]
 plot \
- '$1' using 24:18 title 'CPU user load' with lines lt rgb "#$GREEN", \
- '$1' using 24:19 title 'CPU system load' with lines lt rgb "#$RED", \
- '$1' using 24:21 title 'CPU IO wait time' with lines lt rgb "#$YELLOW"
+ '$1' using 24:18 every ::7 title 'CPU user load' with lines lt rgb "#$GREEN", \
+ '$1' using 24:19 every ::7 title 'CPU system load' with lines lt rgb "#$RED", \
+ '$1' using 24:21 every ::7 title 'CPU IO wait time' with lines lt rgb "#$YELLOW"
 EOF
 
 cat << EOF | gnuplot > $2dstat-cpu-idle.png
 set datafile separator ","
-set xtics rotate
+set xtics rotate by -45
 set xdata time
 set timefmt "%d-%m %H:%M:%S"
 set format x "%m-%d %H:%M"
@@ -130,6 +127,6 @@ set term png size $SIZE
 set grid layerdefault
 set yrange [0:100]
 plot \
- '$1' using 24:20 title 'CPU idle' with lines lt rgb "#$GREY"
+ '$1' using 24:20 every ::7 title 'CPU idle' with lines lt rgb "#$GREY"
 EOF
 
