@@ -20,12 +20,13 @@ import argparse, csv, os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action='store_true', help="Print debug messages")
+parser.add_argument("-o", "--output-directory", default=".", help="Output directory containing the graphs")
 parser.add_argument("-p", "--prefix", default="dstat", help="Prefix all generated images with this string followed by a dash. Default: %(default)s")
 parser.add_argument("-g", "--graph", help="Additional 'plot' subcommand that may be added in all graphs")
 parser.add_argument("-i", "--disk-iops-graph", nargs="+", help="Additional 'plot' subcommands that may be added in disk-IOPS graphs")
 parser.add_argument("-b", "--disk-bandwidth-graph", nargs="+", help="Additional 'plot' subcommands that may be added in disk-bandwidth graphs")
-parser.add_argument("-o", "--device-order", nargs='+', help="Add an additional number so that the disk related files have the specified order, this parameter should be a comma separated list of devices, ex: -o total sde sdd sdf sdg")
-parser.add_argument("-f", "--files", nargs='+', required=True, help="dstat output files")
+parser.add_argument("-d", "--device-order", nargs='+', help="Add an additional number so that the disk related files have the specified order, this parameter should be a comma separated list of devices, ex: -d total sde sdd sdf sdg")
+parser.add_argument("-f", "--files", nargs='+', required=True, help="dstat CSV files")
 
 args = parser.parse_args()
 
@@ -34,6 +35,7 @@ args = parser.parse_args()
 if args.verbose:
     print "Files: %s" % (args.files)
     print "Prefix: %s" % (args.prefix)
+    print "Output directory: %s" % (args.output_directory)
     print "Additional graph (all): %s" % (args.graph)
     print "Additional graph (IOPS): %s" % (args.disk_iops_graph)
     print "Additional graph (bandwidth): %s" % (args.disk_bandwidth_graph)
@@ -50,7 +52,7 @@ def generate_graph(output_file, plot_fragments, additional_commands=[]):
     """Generates a gnuplot graph in the given output file, plotting the given
     fragments. Additional gnuplot commands may be provided to customize the
     graph even more."""
-    base = ['set output "%s-%s"' % (args.prefix, output_file),
+    base = ['set output "%s/%s-%s"' % (args.output_directory, args.prefix, output_file),
             'set datafile separator ","',
             'set xtics rotate by -45',
             'set xdata time',
@@ -69,6 +71,8 @@ def generate_graph(output_file, plot_fragments, additional_commands=[]):
     return
 
 
+
+os.system("mkdir -p '%s'" % (args.output_directory))
 
 for inputfile in args.files:
     if args.verbose:
