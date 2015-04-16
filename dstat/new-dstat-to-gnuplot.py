@@ -22,6 +22,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action='store_true', help="Print debug messages")
 parser.add_argument("-p", "--prefix", default="dstat", help="Prefix all generated images with this string followed by a dash. Default: %(default)s")
 parser.add_argument("-g", "--graph", help="Additional 'plot' subcommand that may be added in all graphs")
+parser.add_argument("-i", "--disk-iops-graph", nargs="+", help="Additional 'plot' subcommands that may be added in disk-IOPS graphs")
+parser.add_argument("-b", "--disk-bandwidth-graph", nargs="+", help="Additional 'plot' subcommands that may be added in disk-bandwidth graphs")
 parser.add_argument("-o", "--device-order", nargs='+', help="Add an additional number so that the disk related files have the specified order, this parameter should be a comma separated list of devices, ex: -o total sde sdd sdf sdg")
 parser.add_argument("-f", "--files", nargs='+', required=True, help="dstat output files")
 
@@ -32,7 +34,9 @@ args = parser.parse_args()
 if args.verbose:
     print "Files: %s" % (args.files)
     print "Prefix: %s" % (args.prefix)
-    print "Additional graph: %s" % (args.graph)
+    print "Additional graph (all): %s" % (args.graph)
+    print "Additional graph (IOPS): %s" % (args.disk_iops_graph)
+    print "Additional graph (bandwidth): %s" % (args.disk_bandwidth_graph)
     print "Device order: %s" % (args.device_order)
 
 
@@ -121,30 +125,42 @@ for inputfile in args.files:
                 ['set format y "%.0s %cB"',
                  'set title "Swap activity (paging)"'])
 
+        if args.disk_iops_graph:
+            disk_iops_additional_graphs = args.disk_iops_graph
+        else:
+            disk_iops_additional_graphs = []
+        if args.disk_bandwidth_graph:
+            disk_bandwidth_additional_graphs = args.disk_bandwidth_graph
+        else:
+            disk_bandwidth_additional_graphs = []
         if args.device_order is not None:
             for idx, device in enumerate(args.device_order):
-                generate_graph("4-%d-disk-%s-usage.png" % (idx, device),
+                generate_graph("4-%d-disk-%s-bandwidth.png" % (idx, device),
+                        disk_bandwidth_additional_graphs +
                         ['"%s" using %d:%d every ::7 title "Blocks in (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:read' % (device, device)], device, yellow),
                          '"%s" using %d:%d every ::7 title "Blocks out (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:writ' % (device, device)], device, red)],
                         ['set format y "%.0s %cB"',
                          'set title "%s bandwidth usage"' % (device)])
                 generate_graph("4-%d-disk-%s-iops.png" % (idx, device),
+                        disk_iops_additional_graphs +
                         ['"%s" using %d:%d every ::7 title "Number of reads (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#read' % (device, device)], device, yellow),
                          '"%s" using %d:%d every ::7 title "Number of writes (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#writ' % (device, device)], device, red)],
                         ['set title "%s IOPS"' % (device)])
         else:
             for device in devices:
-                generate_graph("4-disk-%s-usage.png" % (device),
+                generate_graph("4-disk-%s-bandwidth.png" % (device),
+                        disk_bandwidth_additional_graphs +
                         ['"%s" using %d:%d every ::7 title "Blocks in (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:read' % (device, device)], device, yellow),
                          '"%s" using %d:%d every ::7 title "Blocks out (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:writ' % (device, device)], device, red)],
                         ['set format y "%.0s %cB"',
                          'set title "%s bandwidth usage"' % (device)])
                 generate_graph("4-disk-%s-iops.png" % (device),
+                        disk_iops_additional_graphs +
                         ['"%s" using %d:%d every ::7 title "Number of reads (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#read' % (device, device)], device, yellow),
                          '"%s" using %d:%d every ::7 title "Number of writes (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#writ' % (device, device)], device, red)],
                         ['set title "%s IOPS"' % (device)])
 
-        generate_graph("5-network-usage.png",
+        generate_graph("5-network-bandwidth.png",
                 ['"%s" using %d:%d every ::7 title "Packets received" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['net/total|recv'], yellow),
                  '"%s" using %d:%d every ::7 title "Packets sent" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['net/total|send'], red)],
                 ['set format y "%.0s %cB"',
