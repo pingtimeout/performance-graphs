@@ -113,9 +113,10 @@ for inputfile in args.files:
                 ['set title "Processes queues"'])
 
         generate_graph("2-memory.png",
-                ['"%s" using %d:%d every ::7 title "Free memory" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['memory usage|free'], green),
-                 '"%s" using %d:%d every ::7 title "Used memory" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['memory usage|used'], yellow),
-                 '"%s" using %d:%d every ::7 title "Swapped memory" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['swap|used'], red)],
+                ['"%s" using %d:%d every ::7 title "Free memory" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['advanced memory usage|free'], green),
+                 '"%s" using %d:%d every ::7 title "Used memory" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['advanced memory usage|used'], yellow),
+                 '"%s" using %d:%d every ::7 title "Swapped memory" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['swap|used'], red),
+                 '"%s" using %d:%d every ::7 title "Cached memory" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['advanced memory usage|cach'], grey)],
                 ['set format y "%.0s %cB"',
                  'set title "Memory usage"'])
 
