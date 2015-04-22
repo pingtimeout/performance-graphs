@@ -19,14 +19,15 @@
 import argparse, csv, os
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-v", "--verbose", action='store_true', help="Print debug messages")
-parser.add_argument("-o", "--output-directory", default=".", help="Output directory containing the graphs")
-parser.add_argument("-p", "--prefix", default="dstat", help="Prefix all generated images with this string followed by a dash. Default: %(default)s")
-parser.add_argument("-g", "--graph", help="Additional 'plot' subcommand that may be added in all graphs")
-parser.add_argument("-i", "--disk-iops-graph", nargs="+", help="Additional 'plot' subcommands that may be added in disk-IOPS graphs")
 parser.add_argument("-b", "--disk-bandwidth-graph", nargs="+", help="Additional 'plot' subcommands that may be added in disk-bandwidth graphs")
 parser.add_argument("-d", "--device-order", nargs='+', help="Add an additional number so that the disk related files have the specified order, this parameter should be a comma separated list of devices, ex: -d total sde sdd sdf sdg")
 parser.add_argument("-f", "--files", nargs='+', required=True, help="dstat CSV files")
+parser.add_argument("-g", "--graph", help="Additional 'plot' subcommand that may be added in all graphs")
+parser.add_argument("-i", "--disk-iops-graph", nargs="+", help="Additional 'plot' subcommands that may be added in disk-IOPS graphs")
+parser.add_argument("-o", "--output-directory", default=".", help="Output directory containing the graphs")
+parser.add_argument("-p", "--prefix", default="dstat", help="Prefix all generated images with this string followed by a dash. Default: %(default)s")
+parser.add_argument("-c", "--use-canvas", action='store_true', help="Use the 'canvas' gnuplot terminal instead of generating PNG images")
+parser.add_argument("-v", "--verbose", action='store_true', help="Print debug messages")
 
 args = parser.parse_args()
 
@@ -40,6 +41,7 @@ if args.verbose:
     print "Additional graph (IOPS): %s" % (args.disk_iops_graph)
     print "Additional graph (bandwidth): %s" % (args.disk_bandwidth_graph)
     print "Device order: %s" % (args.device_order)
+    print "Use canvas: %s" % (args.use_canvas)
 
 
 
@@ -48,17 +50,19 @@ yellow="FFD700"
 red="B22222"
 grey="7F7F7F"
 size="1680,1050"
+extension = "html" if args.use_canvas else "png"
+terminal = "canvas standalone mousing" if args.use_canvas else "png"
 def generate_graph(output_file, plot_fragments, additional_commands=[]):
     """Generates a gnuplot graph in the given output file, plotting the given
     fragments. Additional gnuplot commands may be provided to customize the
     graph even more."""
-    base = ['set output "%s/%s-%s"' % (args.output_directory, args.prefix, output_file),
+    base = ['set output "%s/%s-%s.%s"' % (args.output_directory, args.prefix, output_file, extension),
             'set datafile separator ","',
             'set xtics rotate by -45',
             'set xdata time',
             'set timefmt "%d-%m %H:%M:%S"',
             'set format x "%m-%d %H:%M"',
-            'set term png size %s' % (size),
+            'set term %s size %s' % (terminal, size),
             'set grid layerdefault']
     if args.graph is not None:
         plot_fragments.append(args.graph)
@@ -111,12 +115,12 @@ for inputfile in args.files:
         if args.verbose:
             print "Found devices: %s" % (devices)
 
-        generate_graph("1-procs.png",
+        generate_graph("1-procs",
                 ['"%s" using %d:%d every ::7 title "Runnable queue" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['procs|run'], green),
                  '"%s" using %d:%d every ::7 title "Blocked queue" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['procs|blk'], red)],
                 ['set title "Processes queues"'])
 
-        generate_graph("2-memory.png",
+        generate_graph("2-memory",
                 ['"%s" using %d:%d every ::7 title "Free memory" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['advanced memory usage|free'], green),
                  '"%s" using %d:%d every ::7 title "Used memory" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['advanced memory usage|used'], yellow),
                  '"%s" using %d:%d every ::7 title "Swapped memory" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['swap|used'], red),
@@ -124,7 +128,7 @@ for inputfile in args.files:
                 ['set format y "%.0s %cB"',
                  'set title "Memory usage"'])
 
-        generate_graph("3-swap.png",
+        generate_graph("3-swap",
                 ['"%s" using %d:%d every ::7 title "Swap in" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['paging|in'], green),
                  '"%s" using %d:%d every ::7 title "Swap out" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['paging|out'], red)],
                 ['set format y "%.0s %cB"',
@@ -140,47 +144,47 @@ for inputfile in args.files:
             disk_bandwidth_additional_graphs = []
         if args.device_order is not None:
             for idx, device in enumerate(args.device_order):
-                generate_graph("4-%d-disk-%s-bandwidth.png" % (idx, device),
+                generate_graph("4-%d-disk-%s-bandwidth" % (idx, device),
                         disk_bandwidth_additional_graphs +
                         ['"%s" using %d:%d every ::7 title "Blocks in (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:read' % (device, device)], device, yellow),
                          '"%s" using %d:%d every ::7 title "Blocks out (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:writ' % (device, device)], device, red)],
                         ['set format y "%.0s %cB"',
                          'set title "%s bandwidth usage"' % (device)])
-                generate_graph("4-%d-disk-%s-iops.png" % (idx, device),
+                generate_graph("4-%d-disk-%s-iops" % (idx, device),
                         disk_iops_additional_graphs +
                         ['"%s" using %d:%d every ::7 title "Number of reads (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#read' % (device, device)], device, yellow),
                          '"%s" using %d:%d every ::7 title "Number of writes (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#writ' % (device, device)], device, red)],
                         ['set title "%s IOPS"' % (device)])
         else:
             for device in devices:
-                generate_graph("4-disk-%s-bandwidth.png" % (device),
+                generate_graph("4-disk-%s-bandwidth" % (device),
                         disk_bandwidth_additional_graphs +
                         ['"%s" using %d:%d every ::7 title "Blocks in (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:read' % (device, device)], device, yellow),
                          '"%s" using %d:%d every ::7 title "Blocks out (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:writ' % (device, device)], device, red)],
                         ['set format y "%.0s %cB"',
                          'set title "%s bandwidth usage"' % (device)])
-                generate_graph("4-disk-%s-iops.png" % (device),
+                generate_graph("4-disk-%s-iops" % (device),
                         disk_iops_additional_graphs +
                         ['"%s" using %d:%d every ::7 title "Number of reads (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#read' % (device, device)], device, yellow),
                          '"%s" using %d:%d every ::7 title "Number of writes (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#writ' % (device, device)], device, red)],
                         ['set title "%s IOPS"' % (device)])
 
-        generate_graph("5-network-bandwidth.png",
+        generate_graph("5-network-bandwidth",
                 ['"%s" using %d:%d every ::7 title "Packets received" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['net/total|recv'], yellow),
                  '"%s" using %d:%d every ::7 title "Packets sent" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['net/total|send'], red)],
                 ['set format y "%.0s %cB"',
                  'set title "network bandwidth usage"'])
 
-        generate_graph("6-context-switches.png",
+        generate_graph("6-context-switches",
                 ['"%s" using %d:%d every ::7 title "Context switches" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['system|csw'], grey)],
                 ['set title "Context switches"'])
 
-        generate_graph("7-cpu-activity.png",
+        generate_graph("7-cpu-activity",
                 ['"%s" using %d:%d every ::7 title "CPU user load" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|usr'], green),
                  '"%s" using %d:%d every ::7 title "CPU system load" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|sys'], red),
                  '"%s" using %d:%d every ::7 title "CPU system load" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|wai'], yellow)],
                 ['set title "CPU activity"'])
-        generate_graph("7-cpu-idle.png",
+        generate_graph("7-cpu-idle",
                 ['"%s" using %d:%d every ::7 title "CPU idle" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|idl'], grey)],
                 ['set title "CPU idle"']
         )
