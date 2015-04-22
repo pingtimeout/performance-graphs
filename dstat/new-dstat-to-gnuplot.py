@@ -154,7 +154,8 @@ for inputfile in args.files:
                         disk_iops_additional_graphs +
                         ['"%s" using %d:%d every ::7 title "Number of reads (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#read' % (device, device)], device, yellow),
                          '"%s" using %d:%d every ::7 title "Number of writes (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#writ' % (device, device)], device, red)],
-                        ['set title "%s IOPS"' % (device)])
+                        ['set format y "%.0s %c"',
+                         'set title "%s IOPS"' % (device)])
         else:
             for device in devices:
                 generate_graph("4-disk-%s-bandwidth" % (device),
@@ -167,7 +168,8 @@ for inputfile in args.files:
                         disk_iops_additional_graphs +
                         ['"%s" using %d:%d every ::7 title "Number of reads (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#read' % (device, device)], device, yellow),
                          '"%s" using %d:%d every ::7 title "Number of writes (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['dsk/%s|dsk/%s:#writ' % (device, device)], device, red)],
-                        ['set title "%s IOPS"' % (device)])
+                        ['set format y "%.0s %c"',
+                         'set title "%s IOPS"' % (device)])
 
         generate_graph("5-network-bandwidth",
                 ['"%s" using %d:%d every ::7 title "Packets received" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['net/total|recv'], yellow),
@@ -177,7 +179,8 @@ for inputfile in args.files:
 
         generate_graph("6-context-switches",
                 ['"%s" using %d:%d every ::7 title "Context switches" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['system|csw'], grey)],
-                ['set title "Context switches"'])
+                ['set format y "%.0s %c"',
+                 'set title "Context switches"'])
 
         generate_graph("7-cpu-activity",
                 ['"%s" using %d:%d every ::7 title "CPU user load" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|usr'], green),
