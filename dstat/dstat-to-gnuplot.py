@@ -16,6 +16,23 @@
 # along with this work; if not, see <http://www.gnu.org/licenses/>.
 #
 
+# Use with the latest dstat version from Github
+# dstat --proc \
+#       --cpu \
+#       --cpu-use \
+#       --sys \
+#       --mem-adv \
+#       --swap \
+#       --page \
+#       --disk -D total,sda,sdb \
+#       --disk-avgrq \
+#       --disk-avgqu \
+#       --disk-svctm \
+#       --disk-tps \
+#       --disk-wait \
+#       --net \
+#       --time \
+#       --output my-dstat-output.csv
 
 import argparse, csv, os
 from functools import partial
@@ -113,7 +130,7 @@ def generate_swap(file_number, inputfile, column_index):
           'set title "Swap (usage)"'])
 
 def generate_paging(file_number, inputfile, column_index):
-     generate_graph("%d-swap" % (file_number),
+     generate_graph("%d-paging" % (file_number),
          ['"%s" using %d:%d every ::7 title "Swap in" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['paging|in'], green),
           '"%s" using %d:%d every ::7 title "Swap out" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['paging|out'], red)],
          ['set format y "%.0s %cB"',
@@ -129,10 +146,10 @@ def generate_dsk(file_number, device_number, device, inputfile, column_index):
                    ['"%s" using %d:%d every ::7 title "Number of reads (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|dsk/%s:#read' % (device, device)], device, yellow),
                     '"%s" using %d:%d every ::7 title "Number of writes (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|dsk/%s:#writ' % (device, device)], device, red)],
                    ['set format y "%.0s %c"',
-                        'set title "%s IOPS"' % (device)])
+                    'set title "%s IOPS"' % (device)])
 
 def generate_net(file_number, interface_number, interface, inputfile, column_index):
-    generate_graph("5-network-bandwidth",
+    generate_graph("%d-network-bandwidth" % (file_number),
                    ['"%s" using %d:%d every ::7 title "Packets received" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['net/total|recv'], yellow),
                     '"%s" using %d:%d every ::7 title "Packets sent" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['net/total|send'], red)],
                    ['set format y "%.0s %cB"',
@@ -142,7 +159,7 @@ def generate_net(file_number, interface_number, interface, inputfile, column_ind
 
 
 supported_categories = {'procs': partial(generate_procs, 1),                                  # --proc
-                        'cpu-usage': partial(generate_cpu_usage, 2),                          # --cpu
+                        'cpu usage': partial(generate_cpu_usage, 2),                          # --cpu
                         'total cpu usage': partial(generate_total_cpu_usage, 3),              # --cpu-use
                         'system': partial(generate_system, 4),                                # --sys
                         'advanced memory usage': partial(generate_advanced_memory_usage, 5),  # --mem-adv
