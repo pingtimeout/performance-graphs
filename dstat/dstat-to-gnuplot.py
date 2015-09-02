@@ -18,6 +18,7 @@
 
 
 import argparse, csv, os
+from functools import partial
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--device-order", nargs='+', default=[], help="Add an additional number so that the disk related files have the specified order, this parameter should be a space separated list of devices, ex: -d total sde sdd sdf sdg")
@@ -60,7 +61,7 @@ def generate_graph(output_file, plot_fragments, additional_commands=[]):
             'set xtics rotate by -30',
             'set bmargin 5',
             'set term %s size %s' % (terminal, size),
-            'set grid xy']
+            'set grid']
     lines = base + additional_commands
     lines.append("plot %s" % (", ".join(plot_fragments + args.additional_plot)))
     gnuplot_command = "\n".join(lines)
@@ -120,13 +121,11 @@ def generate_paging(file_number, inputfile, column_index):
 
 def generate_dsk(file_number, device_number, device, inputfile, column_index):
     generate_graph("%d-%d-disk-%s-bandwidth" % (file_number, device_number, device),
-                   disk_bandwidth_additional_graphs +
                    ['"%s" using %d:%d every ::7 title "Blocks in (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|dsk/%s:read' % (device, device)], device, yellow),
                     '"%s" using %d:%d every ::7 title "Blocks out (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|dsk/%s:writ' % (device, device)], device, red)],
                    ['set format y "%.0s %cB"',
                     'set title "%s bandwidth usage"' % (device)])
     generate_graph("%d-%d-disk-%s-iops" % (file_number, device_number, device),
-                   disk_iops_additional_graphs +
                    ['"%s" using %d:%d every ::7 title "Number of reads (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|dsk/%s:#read' % (device, device)], device, yellow),
                     '"%s" using %d:%d every ::7 title "Number of writes (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|dsk/%s:#writ' % (device, device)], device, red)],
                    ['set format y "%.0s %c"',
