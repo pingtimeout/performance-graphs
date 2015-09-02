@@ -183,12 +183,12 @@ for inputfile in args.files:
                  'set title "Context switches"'])
 
         generate_graph("7-cpu-activity",
-                ['"%s" using %d:%d every ::7 title "CPU user load" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|usr'], green),
-                 '"%s" using %d:%d every ::7 title "CPU system load" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|sys'], red),
-                 '"%s" using %d:%d every ::7 title "CPU system load" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|wai'], yellow)],
+                ['"%s" using %d:%d every ::7 title "User" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|usr'], green),
+                 '"%s" using %d:%d every ::7 title "System" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|sys'], red),
+                 '"%s" using %d:%d every ::7 title "Wait" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|wai'], yellow)],
                 ['set title "CPU activity"'])
         generate_graph("7-cpu-idle",
-                ['"%s" using %d:%d every ::7 title "CPU idle" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|idl'], grey)],
+                ['"%s" using %d:%d every ::7 title "Idle" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, index['system|time'], index['total cpu usage|idl'], grey)],
                 ['set title "CPU idle"']
         )
 
