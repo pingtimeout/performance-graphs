@@ -24,12 +24,8 @@
 #       --mem-adv \
 #       --swap \
 #       --page \
-#       --disk -D total,sda,sdb \
-#       --disk-avgrq \
-#       --disk-avgqu \
-#       --disk-svctm \
+#       --disk -D total \
 #       --disk-tps \
-#       --disk-wait \
 #       --net \
 #       --time \
 #       --output my-dstat-output.csv
