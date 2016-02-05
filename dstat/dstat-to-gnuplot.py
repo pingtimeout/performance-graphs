@@ -138,15 +138,15 @@ def generate_paging(file_number, inputfile, column_index):
 
 def generate_dsk(file_number, device_number, device, inputfile, column_index):
     generate_graph("%d-%d-disk-%s-bandwidth" % (file_number, device_number, device),
-                   ['"%s" using %d:%d every ::7 title "Blocks in (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|dsk/%s:read' % (device, device)], device, yellow),
-                    '"%s" using %d:%d every ::7 title "Blocks out (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|dsk/%s:writ' % (device, device)], device, red)],
+                   ['"%s" using %d:%d every ::7 title "Blocks in (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|read' % (device)], device, yellow),
+                    '"%s" using %d:%d every ::7 title "Blocks out (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|writ' % (device)], device, red)],
                    ['set format y "%.0s %cB"',
-                    'set title "%s bandwidth usage"' % (device)])
+                    'set title "\'%s\' disk bandwidth usage"' % (device)])
     generate_graph("%d-%d-disk-%s-iops" % (file_number, device_number, device),
-                   ['"%s" using %d:%d every ::7 title "Number of reads (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|dsk/%s:#read' % (device, device)], device, yellow),
-                    '"%s" using %d:%d every ::7 title "Number of writes (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|dsk/%s:#writ' % (device, device)], device, red)],
+                   ['"%s" using %d:%d every ::7 title "Number of reads (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|#read' % (device)], device, yellow),
+                    '"%s" using %d:%d every ::7 title "Number of writes (%s)" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['dsk/%s|#writ' % (device)], device, red)],
                    ['set format y "%.0s %c"',
-                    'set title "%s IOPS"' % (device)])
+                    'set title "\'%s\' disk IOPS"' % (device)])
 
 def generate_net(file_number, interface_number, interface, inputfile, column_index):
     generate_graph("%d-network-bandwidth" % (file_number),
