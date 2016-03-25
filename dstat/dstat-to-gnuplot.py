@@ -96,10 +96,14 @@ def generate_cpu_usage(file_number, inputfile, column_index):
                    ['"%s" using %d:%d every ::7 title "User" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['total cpu usage|usr'], green),
                     '"%s" using %d:%d every ::7 title "System" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['total cpu usage|sys'], red),
                     '"%s" using %d:%d every ::7 title "Wait" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['total cpu usage|wai'], yellow)],
-                   ['set title "CPU activity"'])
+                   ['set yrange [0:]',
+                    'set ytics 5',
+                    'set title "CPU activity"'])
     generate_graph("%d-cpu-idle" % (file_number),
                    ['"%s" using %d:%d every ::7 title "Idle" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['total cpu usage|idl'], grey)],
-                   ['set title "CPU idle"'])
+                   ['set yrange [0:]',
+                    'set ytics 5',
+                    'set title "CPU idle"'])
 
 def generate_total_cpu_usage(file_number, inputfile, column_index):
     pass
