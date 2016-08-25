@@ -91,7 +91,7 @@ def generate_procs(file_number, inputfile, column_index):
                     '"%s" using %d:%d every ::7 title "Blocked queue" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['procs|blk'], red)],
                    ['set title "Processes queues"'])
 
-def generate_cpu_usage(file_number, inputfile, column_index):
+def generate_total_cpu_usage(file_number, inputfile, column_index):
     generate_graph("%d-cpu-activity" % (file_number),
                    ['"%s" using %d:%d every ::7 title "User" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['total cpu usage|usr'], green),
                     '"%s" using %d:%d every ::7 title "System" with points pointtype 7 pointsize 0.5 linetype rgb "#%s"' % (inputfile, column_index['system|time'], column_index['total cpu usage|sys'], red),
@@ -105,7 +105,7 @@ def generate_cpu_usage(file_number, inputfile, column_index):
                     'set ytics 5',
                     'set title "CPU idle"'])
 
-def generate_total_cpu_usage(file_number, inputfile, column_index):
+def generate_per_cpu_usage(file_number, inputfile, column_index):
     pass
 
 def generate_system(file_number, inputfile, column_index):
@@ -159,8 +159,8 @@ def generate_net(file_number, interface_number, interface, inputfile, column_ind
 
 
 supported_categories = {'procs': partial(generate_procs, 1),                                  # --proc
-                        'cpu usage': partial(generate_cpu_usage, 2),                          # --cpu
-                        'total cpu usage': partial(generate_total_cpu_usage, 3),              # --cpu-use
+                        'total cpu usage': partial(generate_total_cpu_usage, 2),              # --cpu
+                        'per cpu usage': partial(generate_per_cpu_usage, 3),                  # --cpu-use
                         'system': partial(generate_system, 4),                                # --sys
                         'advanced memory usage': partial(generate_advanced_memory_usage, 5),  # --mem-adv
                         'swap': partial(generate_swap, 6),                                    # --swap
