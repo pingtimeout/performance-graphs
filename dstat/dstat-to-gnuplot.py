@@ -39,7 +39,7 @@ parser.add_argument("-f", "--files", nargs='+', required=True, help="dstat CSV f
 parser.add_argument("-g", "--additional-plot", nargs='+', default=[], help="Additional 'plot' subcommand that may be added in all graphs")
 parser.add_argument("-o", "--output-directory", default=".", help="Output directory containing the graphs")
 parser.add_argument("-p", "--prefix", default="dstat", help="Prefix all generated images with this string followed by a dash. Default: %(default)s")
-parser.add_argument("-c", "--use-canvas", action='store_true', help="Use the 'canvas' gnuplot terminal instead of generating PNG images")
+parser.add_argument("-s", "--use-svg", action='store_true', help="Use the 'svg' gnuplot terminal instead of generating PNG images")
 parser.add_argument("-v", "--verbose", action='store_true', help="Print debug messages")
 
 args = parser.parse_args()
@@ -50,7 +50,7 @@ if args.verbose:
     print "Output directory: %s" % (args.output_directory)
     print "Additional graph (all): %s" % (args.additional_plot)
     print "Device order: %s" % (args.device_order)
-    print "Use canvas: %s" % (args.use_canvas)
+    print "Use svg: %s" % (args.use_svg)
 
 
 
@@ -59,8 +59,8 @@ yellow="FFD700"
 red="B22222"
 grey="7F7F7F"
 size="1680,1050"
-extension = "html" if args.use_canvas else "png"
-terminal = "canvas standalone mousing" if args.use_canvas else "png"
+extension = "svg" if args.use_svg else "png"
+terminal = "svg enhanced mouse" if args.use_svg else "png"
 
 def generate_graph(output_file, plot_fragments, additional_commands=[]):
     """Generates a gnuplot graph in the given output file, plotting the given
