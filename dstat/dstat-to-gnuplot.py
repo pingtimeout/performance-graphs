@@ -17,6 +17,7 @@
 #
 
 # Use with the latest dstat version from Github
+# dstat --proc --cpu --cpu-use --sys --mem-adv --swap --page --disk -D total --disk-tps --net --time --output my-dstat-output.csv
 # dstat --proc \
 #       --cpu \
 #       --cpu-use \
