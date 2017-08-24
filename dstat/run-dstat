@@ -1,0 +1,4 @@
+#!/bin/bash
+
+dstat -pmgsdrnyct 1
+
